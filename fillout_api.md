@@ -50,7 +50,7 @@ The project includes unit tests for the filterResponses function to ensure its f
 Deployment:
 
 The project is deployed on GitHub for reference.
-Automated deployment(CICD) is setup on render.com with a custom URL -  https://fillout-api-c1fu.onrender.com/cLZojxk94ous/filteredResponses?filters=[]
+Automated deployment(CICD) is setup on render.com with a custom URL -  https://fillout-api-c1fu.onrender.com/{formId}/filteredResponses?filters=[filter_condition]
 
 Additional Notes: 
 
@@ -58,9 +58,23 @@ Enhancements for future implementation
 
 This is a basic implementation that can be extended to support additional features like pagination, sorting, and handling responses across multiple pages.
 Consider implementing error handling for potential issues during the API call to the external service.
-Consider using Azure key vault or AWS SAM to store keys
-Consider using Redis cache/Kafka to store the responses
-Consider creating a client UI to render the filtered responses in a grid
-Consider shortening the URL path by hiding query strings, giving a meaningful path etc
+Consider using Azure key vault or AWS SAM to store keys.
+Consider using Redis cache/Kafka to store the responses.
+Consider creating a client UI to render the filtered responses in a grid.
+Consider shortening the URL path by hiding query strings, giving a meaningful path, etc.
+Consider adding more test cases.
+
+Separation of concerns
+
+Consider creating separate modules for:
+Configuration: Accessing environment variables (form ID, API key)
+API Client: Handling communication with the Fillout API
+Response Filtering: Implementing the filterResponses logic
+Response Formatting: Constructing the final response object
+
+Scalability
+
+While the current code handles a single form, consider how it might scale if you need to support multiple forms with different filtering criteria. We could explore approaches like dynamic endpoint paths based on form ID or extending the filterResponses function to handle form-specific filters.
+
 
 
