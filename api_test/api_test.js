@@ -1,48 +1,65 @@
-// Import necessary modules
 const axios = require('axios');
-const app = require('./app'); // Assuming your app setup is in app.js
-const { filterResponses } = require('./filterResponses'); // Assuming filterResponses function is in a separate file
+const supertest = require('supertest');
+const app = require('src/index'); // Correct path to your Express app file
 
-// Mock axios.get to simulate API response
 jest.mock('axios');
 
-describe('GET /filteredResponses endpoint', () => {
- test('should return filtered responses', async () => {
-// Mock response data
-const mockResponse = {
-data: {
- responses: [
-// Sample response data
-{ id: 1, name: 'Abhinaya', timestamp: '2024-03-21T05:01:47.691Z' },
-{ id: 2, name: 'John', timestamp: '2024-03-22T05:01:47.691Z' },
-{ id: 3, name: 'Abhinaya', timestamp: '2024-03-23T05:01:47.691Z' }
-] }
-  };
-    
- // Mock axios.get to return mockResponse when called
-axios.get.mockResolvedValue(mockResponse);
+describe('GET /:formId/filteredResponses', () => {
+  let server;
 
-// Make a request to the endpoint
-const response = await request(app).get(`/${formId}/filteredResponses`);
-    
- // Assertions
-expect(response.status).toBe(200);
-expect(response.body.totalResponses).toBe(2); // Two responses match the filters
-expect(response.body.responses).toEqual([
-{ id: 1, name: 'Abhinaya', timestamp: '2024-03-21T05:01:47.691Z' },
-{ id: 3, name: 'Abhinaya', timestamp: '2024-03-23T05:01:47.691Z' }
-]);
-expect(response.body.pageCount).toBe(1);
-});
+  beforeAll(() => {
+    server = app.listen(5000); // Listen on a different port for testing
+  });
 
- test('should handle errors', async () => {
-// Mock axios.get to throw an error
-axios.get.mockRejectedValue(new Error('API Error'));
-// Make a request to the endpoint
-const response = await request(app).get(`/${formId}/filteredResponses`);
-    
-// Assertions
-expect(response.status).toBe(500);
-expect(response.body).toEqual({ message: 'Error fetching responses' });
-});
+  afterAll((done) => {
+    server.close(done);
+  });
+
+  it('should return filtered responses', async () => {
+    const mockedResponses = [
+      {
+        questions: [
+          { id: 'question1', value: 'value1' },
+          { id: 'question2', value: 'value2' }
+        ]
+      },
+      {
+        questions: [
+          { id: 'question1', value: 'value1' },
+          { id: 'question2', value: 'value3' }
+        ]
+      }
+    ];
+
+    axios.get.mockResolvedValue({ data: { responses: mockedResponses } });
+
+    const response = await supertest(server)
+      .get('/cLZojxk94ous/filteredResponses')
+      .query({ filters: JSON.stringify([{ id: 'question2', condition: 'equals', value: 'value3' }]) })
+      .expect(200);
+
+    expect(response.body).toEqual({
+      responses: [
+        {
+          questions: [
+            { id: 'question1', value: 'value1' },
+            { id: 'question2', value: 'value3' }
+          ]
+        }
+      ],
+      totalResponses: 1,
+      pageCount: 1
+    });
+  });
+
+  it('should handle errors', async () => {
+    axios.get.mockRejectedValue(new Error('API error'));
+
+    const response = await supertest(server)
+      .get('/cLZojxk94ous/filteredResponses')
+      .query({ filters: JSON.stringify([{ id: 'question2', condition: 'equals', value: 'value3' }]) })
+      .expect(500);
+
+    expect(response.body).toEqual({ message: 'Error fetching responses' });
+  });
 });
