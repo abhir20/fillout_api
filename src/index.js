@@ -48,20 +48,7 @@ function filterResponses(responses, filters) {
 
 // Endpoint to fetch filtered responses
 app.get(`/${formId}/filteredResponses`, async (req, res) => {
-   const filters = req.query.filters ? req.query.filters : [];
-    // const filters = [
-    //   {
-    //     id: "bE2Bo4cGUv49cjnqZ4UnkW",
-    //     condition: "equals",
-    //     value: "Abhinaya",
-    //   },
-    //   {
-    //     id: "dSRAe3hygqVwTpPK69p5td",
-    //     condition: "greater_than",
-    //     value: "2024-03-20T05:01:47.691Z"
-    //   }
-    // ]; //Added for unit testing
-
+  const filters = req.query.filters ? JSON.parse(req.query.filters) : [];
     try {
       const response = await axios.get(`https://api.fillout.com/v1/api/forms/${formId}/submissions`, {
         headers: {
