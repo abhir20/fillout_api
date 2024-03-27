@@ -1,19 +1,31 @@
 const axios = require('axios');
 const supertest = require('supertest');
-const app = require('src/index'); // Correct path to your Express app file
+const app = require('src/index.js'); // Correct path to your Express app file 
 
 jest.mock('axios');
 
 describe('GET /:formId/filteredResponses', () => {
   let server;
+  const timeout = 5000;
 
-  beforeAll(() => {
-    server = app.listen(5000); // Listen on a different port for testing
+  beforeAll(async () => {
+    server = await app.listen(3001); // Listen on a different port for testing
+
+    const timer = setTimeout(() => {
+      done.fail(new Error('Server failed to start within timeout')); // Fail test if timeout occurs
+    }, timeout);
+  
+    server.on('listening', () => {
+      clearTimeout(timer); // Clear timeout if server starts successfully
+      done();
+    });
+  
+  }, timeout);
+
+  afterAll(async(done) => {
+    await server.close(done);
   });
 
-  afterAll((done) => {
-    server.close(done);
-  });
 
   it('should return filtered responses', async () => {
     const mockedResponses = [
@@ -31,7 +43,8 @@ describe('GET /:formId/filteredResponses', () => {
       }
     ];
 
-    axios.get.mockResolvedValue({ data: { responses: mockedResponses } });
+   
+    axios.get.mockResolvedValue(async(), { data: { responses: mockedResponses } });
 
     const response = await supertest(server)
       .get('/cLZojxk94ous/filteredResponses')
