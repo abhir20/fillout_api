@@ -1,4 +1,4 @@
-const PORT = 3000;
+
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
@@ -7,6 +7,7 @@ require('dotenv').config();
 const app = express();
 const formId = process.env.FORM_ID_TOTEST; //Added in env file -  test with your form id
 const api_key = process.env.API_KEY;
+const port = 3000;
 
 
 // Function to filter responses based on provided filters
@@ -69,7 +70,6 @@ app.get(`/${formId}/filteredResponses`, async (req, res) => {
         params: req.query, // Pass through existing pagination parameters
       });
       
-      console.log(response.data.responses);
       const filteredResponses = filterResponses(response.data.responses, filters);
       const filteredData = {
         responses: filteredResponses,
@@ -85,4 +85,4 @@ app.get(`/${formId}/filteredResponses`, async (req, res) => {
   });
 
 
-app.listen(PORT, () => console.log(`Server is up on port ${PORT}`))
+app.listen(port, () => console.log(`Server is up on port ${port}`))
