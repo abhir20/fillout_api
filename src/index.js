@@ -5,7 +5,8 @@ const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
-const formId = process.env.formId; //Added in env file -  test with your form id
+const formId = process.env.FORM_ID_TOTEST; //Added in env file -  test with your form id
+const api_key = process.env.API_KEY;
 
 
 // Function to filter responses based on provided filters
@@ -46,8 +47,7 @@ function filterResponses(responses, filters) {
 
 // Endpoint to fetch filtered responses
 app.get(`/${formId}/filteredResponses`, async (req, res) => {
-    const filters = req.query.filters ? JSON.parse(req.query.query.filters) : [];
-
+   const filters = req.query.filters ? req.query.filters : [];
     // const filters = [
     //   {
     //     id: "bE2Bo4cGUv49cjnqZ4UnkW",
@@ -68,7 +68,8 @@ app.get(`/${formId}/filteredResponses`, async (req, res) => {
         },
         params: req.query, // Pass through existing pagination parameters
       });
-  
+      
+      console.log(response.data.responses);
       const filteredResponses = filterResponses(response.data.responses, filters);
       const filteredData = {
         responses: filteredResponses,
