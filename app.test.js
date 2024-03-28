@@ -1,6 +1,6 @@
 const axios = require('axios');
 const supertest = require('supertest');
-const app = require('src/index.js'); // Correct path to your Express app file 
+const app = require('src/server.js'); // Correct path to your Express app file 
 
 jest.mock('axios');
 
